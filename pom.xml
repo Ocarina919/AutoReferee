@@ -9,7 +9,7 @@
 
   <groupId>org.mctourney.autoreferee</groupId>
   <artifactId>AutoReferee</artifactId>
-  <version>2.8.4-playserver</version>
+  <version>2.8.5-playserver</version>
   <name>AutoReferee Core Plugin</name>
   <url>https://www.reddit.com/r/mctourney</url>
   <description>Bukkit plugin for automatically refereeing competitive Minecraft matches.</description>
@@ -281,12 +281,14 @@
                   <include>joda-time:joda-time</include>
                 </includes>
               </artifactSet>
-              <filter>
-                 <artifact>commons-logging:commons-logging</artifact>
-                 <includes>
-                     <include>org/apache/commons/logging/impl/*</include>
-                 </includes>
-              </filter>  
+              <filters>
+                <filter>
+                  <artifact>commons-logging:commons-logging</artifact>
+                  <includes>
+                    <include>org/apache/commons/logging/impl/*</include>
+                  </includes>
+                </filter>
+              </filters>
             </configuration>
           </execution>
         </executions>
