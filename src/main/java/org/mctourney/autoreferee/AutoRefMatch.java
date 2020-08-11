@@ -16,6 +16,18 @@ import java.util.zip.ZipOutputStream;
 
 import javax.imageio.ImageIO;
 
+import com.amazonaws.AmazonServiceException;
+import com.amazonaws.regions.Regions;
+import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.AmazonS3ClientBuilder;
+import com.amazonaws.services.s3.model.AccessControlList;
+import com.amazonaws.services.s3.model.CanonicalGrantee;
+import com.amazonaws.services.s3.model.Grant;
+import com.amazonaws.services.s3.model.GroupGrantee;
+import com.amazonaws.services.s3.model.ObjectMetadata;
+import com.amazonaws.services.s3.model.Permission;
+import com.amazonaws.services.s3.model.PutObjectRequest;
+import com.amazonaws.services.s3.model.SetPublicAccessBlockRequest;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
@@ -3195,9 +3207,10 @@ public class AutoRefMatch implements Metadatable
 			String webstats = null;
 			if (!event.isCancelled())
 			{
+				String localFileID = new SimpleDateFormat("yyyy.MM.dd-HH.mm.ss").format(new Date()) + ".html";
+				
 				if (this.localStorage != null)
 				{
-					String localFileID = new SimpleDateFormat("yyyy.MM.dd-HH.mm.ss").format(new Date()) + ".html";
 					File localReport = new File(this.localStorage, localFileID);
 
 					try
@@ -3206,9 +3219,9 @@ public class AutoRefMatch implements Metadatable
 						localReport.setReadable(true);
 					}
 					catch (IOException e) { e.printStackTrace(); }
-					webstats = serveLocally() ? (webDirectory + localFileID) : uploadReport(report);
+					webstats = serveLocally() ? (webDirectory + localFileID) : uploadReport(report, localFileID);
 				}
-				else webstats = uploadReport(report);
+				else webstats = uploadReport(report, localFileID);
 			}
 
 			if (webstats == null) broadcastSync(ChatColor.RED + AutoReferee.NO_WEBSTATS_MESSAGE);
@@ -3222,18 +3235,53 @@ public class AutoRefMatch implements Metadatable
 		new MatchReportSaver().runTaskAsynchronously(AutoReferee.getInstance());
 	}
 
-	private String uploadReport(String report)
+	private String uploadReport(String report, String filename)
 	{
-		String failure;
-		try
+		String failure = "Unknown error";
+		// removed in favor of AWS bucket
+		/*try
 		{
 			// submit our request to pastehtml, get back a link to the report
 			return QueryUtil.syncQuery("http://pastehtml.com/upload/create",
 				"input_type=html&result=address&minecraft=1",
 				"txt=" + URLEncoder.encode(report, "UTF-8"));
 		}
-		catch (IOException e) { failure = e.getLocalizedMessage(); }
+		catch (IOException e) { failure = e.getLocalizedMessage(); }*/
+		
+		final AmazonS3 s3 = AmazonS3ClientBuilder.standard()
+				.withRegion(Regions.US_EAST_1).build();
+		
+		try {
+			
+			CanonicalGrantee grantee = new CanonicalGrantee( "406f1cf2091f7a31d5616a430f6f4990bc8a965dd651a457eacd3acd4a544f08");
+			Grant grant = new Grant(grantee, Permission.FullControl);
+			Grant pub = new Grant( GroupGrantee.AllUsers, Permission.Read );
+			
+			AccessControlList acl = new AccessControlList();
+			acl.grantAllPermissions( new Grant[] { grant, pub }  );
+			
+			// https://github.com/aws/aws-sdk-java/blob/master/aws-java-sdk-s3/src/main/java/com/amazonaws/services/s3/AmazonS3Client.java
+			byte[] contentBytes = report.getBytes("utf8");
 
+	        InputStream is = new ByteArrayInputStream(contentBytes);
+	        ObjectMetadata metadata = new ObjectMetadata();
+	        metadata.setContentType("text/html");
+	        metadata.setContentLength(contentBytes.length);
+			
+			//File f = new File("/home/char/Pictures/test.html");
+			PutObjectRequest req = new PutObjectRequest("godgamerstats", "summary/" + filename, is, metadata );
+			req.setAccessControlList(acl);
+			
+			
+			s3.putObject( req );
+			
+			return "http://http://godgamerstats.s3.amazonaws.com/summary/" + filename;
+		} catch(AmazonServiceException e) {
+			failure = e.getLocalizedMessage();
+		} catch (UnsupportedEncodingException e) {
+			failure = e.getLocalizedMessage();
+		}
+		
 		// somewhat quietly log the reason for the failed upload
 		AutoReferee.log("Report upload failed: " + failure, Level.SEVERE);
 		return null;

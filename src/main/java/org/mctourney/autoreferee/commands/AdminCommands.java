@@ -1,8 +1,12 @@
 package org.mctourney.autoreferee.commands;
 
 import java.io.IOException;
+import java.security.SecureRandom;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -17,6 +21,7 @@ import org.bukkit.plugin.Plugin;
 import org.apache.commons.lang.StringUtils;
 import org.mctourney.autoreferee.AutoRefMap;
 import org.mctourney.autoreferee.AutoRefMatch;
+import org.mctourney.autoreferee.AutoRefPlayer;
 import org.mctourney.autoreferee.AutoRefTeam;
 import org.mctourney.autoreferee.AutoReferee;
 import org.mctourney.autoreferee.event.match.MatchUnloadEvent;
@@ -138,6 +143,55 @@ public class AdminCommands implements CommandHandler
 		return true;
 	}
 
+	@AutoRefCommand(name={"autoref", "randomize"}, 
+		description="Wow! That's so windey!",
+		usage="<command>")
+	@AutoRefPermission(nodes={"autoreferee.admin"})
+	
+	public boolean randomizeTeams(CommandSender sender, AutoRefMatch match, String[] args, CommandLine options)
+	{
+		if(match == null) return false;
+		
+		if(!match.getCurrentState().isBeforeMatch()) {
+			sender.sendMessage(ChatColor.RED + "Cannot randomize team during or after match!");
+			return true;
+		}
+		
+		for( AutoRefPlayer arp : match.getPlayers() ) {
+			AutoRefTeam t = arp.getTeam();
+			
+			if(t != null) {
+				t.leave(arp.getPlayer());
+			}
+		}
+		
+		int teams = match.getTeams().size();
+		
+		if(teams <= 0)
+			return true;
+		
+		World world = match.getWorld();
+		
+		if(world == null) return true;
+		
+		//Collection<Player> players = world.getPlayers();
+		
+		List<Player> newPlayers = new ArrayList<Player>(world.getPlayers());
+		Collections.shuffle(newPlayers, new SecureRandom());
+		
+		List<AutoRefTeam> arTeams = new ArrayList<AutoRefTeam>(match.getTeams());
+		Collections.shuffle(arTeams, new SecureRandom());
+		
+		int i = 0;
+		for(Player p : newPlayers ) {
+			AutoRefTeam team = arTeams.get(i % teams);
+			team.join(p, Reason.MANUAL);
+			i++;
+		}
+		
+		return true;
+	}
+	
 	@AutoRefCommand(name={"autoref", "reload"}, options="x",
 		description="Reloads the current map (or specified map) to its original, unmodified state. Players are migrated to the new copy.",
 		usage="<command> [<map name>]",
