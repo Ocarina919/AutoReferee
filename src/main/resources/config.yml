@@ -4,6 +4,8 @@ console-log: true
 console-colors: true
 auto-update: true
 
+server-ip:
+
 allow-ties: false
 time-limit: 0
 

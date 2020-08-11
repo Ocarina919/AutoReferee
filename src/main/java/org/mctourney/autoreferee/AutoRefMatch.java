@@ -3205,6 +3205,7 @@ public class AutoRefMatch implements Metadatable
 			report = event.getWebstats();
 
 			String webstats = null;
+			String domain = AutoReferee.getInstance().getConfig().getString("server-ip", null);
 			if (!event.isCancelled())
 			{
 				String localFileID = new SimpleDateFormat("yyyy.MM.dd-HH.mm.ss").format(new Date()) + ".html";
@@ -3219,13 +3220,18 @@ public class AutoRefMatch implements Metadatable
 						localReport.setReadable(true);
 					}
 					catch (IOException e) { e.printStackTrace(); }
-					webstats = serveLocally() ? (webDirectory + localFileID) : uploadReport(report, localFileID);
+					webstats = localFileID;
+					//webstats = serveLocally() ? (webDirectory + localFileID) : uploadReport(report, localFileID);
 				}
-				else webstats = uploadReport(report, localFileID);
+				// else webstats = uploadReport(report, localFileID);
 			}
 
 			if (webstats == null) broadcastSync(ChatColor.RED + AutoReferee.NO_WEBSTATS_MESSAGE);
-			else broadcastSync(ChatColor.RED + "Match Summary: " + ChatColor.RESET + webstats);
+			else {
+				if (domain != null) {
+					broadcastSync(ChatColor.RED + "Match Summary: " + ChatColor.RESET + "https://" + domain + "/" + webstats);
+				}
+			}
 		}
 	}
 
