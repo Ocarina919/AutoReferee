@@ -17,7 +17,7 @@
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <bukkit.version>1.8.8-R0.1-SNAPSHOT</bukkit.version>
-    <java.target.version>1.6</java.target.version>
+    <java.target.version>1.7</java.target.version>
   </properties>
 
   <scm>
@@ -42,23 +42,6 @@
   </repositories>
 
   <dependencies>
-    <!-- Required component -->
-    <dependency>
-      <groupId>com.sk89q</groupId>
-      <artifactId>worldedit</artifactId>
-      <version>5.3</version>
-      <exclusions>
-        <exclusion>
-          <groupId>org.spout</groupId>
-          <artifactId>spoutapi</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>org.spout</groupId>
-          <artifactId>vanilla</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-
     <!-- Bukkit -->
     <dependency>
       <groupId>org.bukkit</groupId>
@@ -86,6 +69,7 @@
       <version>3.1</version>
     </dependency>
 
+    <!--TODO Change me?-->
     <dependency>
       <groupId>com.google.guava</groupId>
       <artifactId>guava</artifactId>
@@ -122,13 +106,6 @@
       <version>2.0.4</version>
     </dependency>
 
-    <dependency>
-      <groupId>org.mcstats.bukkit</groupId>
-      <artifactId>metrics</artifactId>
-      <version>R8-SNAPSHOT</version>
-      <scope>compile</scope>
-    </dependency>
-    
     <dependency>
 	    <groupId>com.amazonaws</groupId>
 	    <artifactId>aws-java-sdk-s3</artifactId>

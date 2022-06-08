@@ -6,7 +6,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-import java.util.Set;
 import java.util.UUID;
 import java.util.logging.Level;
 
@@ -22,20 +21,14 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.generator.ChunkGenerator;
-import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.plugin.messaging.Messenger;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scoreboard.Scoreboard;
 
-import com.sk89q.worldedit.bukkit.WorldEditPlugin;
-
-import org.mcstats.Metrics;
-import org.mcstats.Metrics.Graph;
 
 import org.mctourney.autoreferee.commands.AdminCommands;
-import org.mctourney.autoreferee.commands.ConfigurationCommands;
 import org.mctourney.autoreferee.commands.PlayerCommands;
 import org.mctourney.autoreferee.commands.PracticeCommands;
 import org.mctourney.autoreferee.commands.ScoreboardCommands;
@@ -52,11 +45,9 @@ import org.mctourney.autoreferee.listeners.lobby.LobbyListener.LobbyMode;
 import org.mctourney.autoreferee.util.NullChunkGenerator;
 import org.mctourney.autoreferee.util.SportBukkitUtil;
 import org.mctourney.autoreferee.util.commands.CommandManager;
-import org.mctourney.autoreferee.util.metrics.PieChartGraph;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 
 /**
  * Base plugin class
@@ -315,7 +306,6 @@ public class AutoReferee extends JavaPlugin
 		commandManager.registerCommands(new PlayerCommands(this), this);
 		commandManager.registerCommands(new AdminCommands(this), this);
 		commandManager.registerCommands(new SpectatorCommands(this), this);
-		commandManager.registerCommands(new ConfigurationCommands(this), this);
 		commandManager.registerCommands(new ScoreboardCommands(this), this);
 
 		commandManager.registerCommands(lobbyListener, this);
@@ -336,10 +326,6 @@ public class AutoReferee extends JavaPlugin
 
 		// attempt to setup the plugin channels
 		setupPluginChannels();
-
-		// fire up the plugin metrics
-		try { setupPluginMetrics(); }
-		catch (IOException e) { getLogger().severe("Plugin Metrics not enabled."); }
 
 		// wrap up, debug to follow this message
 		getLogger().info(this.getName() + " (" + Bukkit.getName() + ") loaded successfully" +
@@ -379,29 +365,6 @@ public class AutoReferee extends JavaPlugin
 		// setup referee plugin channels
 		m.registerOutgoingPluginChannel(this, REFEREE_PLUGIN_CHANNEL);
 		m.registerIncomingPluginChannel(this, REFEREE_PLUGIN_CHANNEL, refChannelListener);
-	}
-
-	protected PieChartGraph playedMapsTracker = null;
-
-	private void setupPluginMetrics()
-		throws IOException
-	{
-		Metrics metrics = new Metrics(this);
-
-		Set<String> mapNames = Sets.newHashSet();
-		for (AutoRefMap map : AutoRefMap.getRemoteMaps())
-			mapNames.add(map.getName());
-
-		Graph gMaps = metrics.createGraph("Most Popular Maps");
-		playedMapsTracker = new PieChartGraph(gMaps, mapNames);
-
-		metrics.start();
-	}
-
-	public static WorldEditPlugin getWorldEdit()
-	{
-		Plugin x = Bukkit.getPluginManager().getPlugin("WorldEdit");
-		return (x != null && x instanceof WorldEditPlugin) ? (WorldEditPlugin) x : null;
 	}
 
 	private UUID consoleWorld = null;

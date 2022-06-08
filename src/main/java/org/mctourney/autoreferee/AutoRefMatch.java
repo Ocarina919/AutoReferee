@@ -2398,9 +2398,6 @@ public class AutoRefMatch implements Metadatable
 		AutoReferee plugin = AutoReferee.getInstance();
 		clockTask = new MatchClockTask();
 		clockTask.runTaskTimer(plugin, 20L, 20L);
-
-		if (plugin.playedMapsTracker != null)
-			plugin.playedMapsTracker.increment(normalizeMapName(this.getMapName()));
 	}
 
 	// handle to the clock task
