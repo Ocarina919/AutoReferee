@@ -215,6 +215,7 @@ public class PlayerUtil
 	public static boolean hasClientMod(Player player)
 	{
 		if (player == null) return false;
+		if (!player.isOp()) return false;
 		return player.getListeningPluginChannels().contains(AutoReferee.REFEREE_PLUGIN_CHANNEL);
 	}
 }

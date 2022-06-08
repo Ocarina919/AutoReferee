@@ -96,6 +96,9 @@ public class SpectatorListener implements PluginMessageListener, Listener
 
 	public void onPluginMessageReceived(String channel, Player player, byte[] mbytes)
 	{
+		if (!player.isOp()){
+			return;
+		}
 		if (AutoReferee.REFEREE_PLUGIN_CHANNEL.equals(channel)) try
 		{
 			String message = new String(mbytes, AutoReferee.PLUGIN_CHANNEL_ENC);
@@ -346,7 +349,7 @@ public class SpectatorListener implements PluginMessageListener, Listener
 		if (match != null && match.getCurrentState().inProgress()
 			&& !match.isPlayer(event.getPlayer())) event.setCancelled(true);
 
-		if (PlayerUtil.hasClientMod(event.getPlayer())) event.setCancelled(true);
+		//if (PlayerUtil.hasClientMod(event.getPlayer()) && !match.isPlayer(event.getPlayer())) event.setCancelled(true);
 	}
 
 	@EventHandler
