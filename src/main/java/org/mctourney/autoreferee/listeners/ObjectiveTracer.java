@@ -540,9 +540,12 @@ public class ObjectiveTracer implements Listener
 
 		GoalsInventorySnapshot snap = new GoalsInventorySnapshot(event.getEntity().getItemStack(), goals);
 
+		if (snap.size() == 0){
+			return;
+		}
+
 		match.addEvent(new TranscriptEvent(match,
 				TranscriptEvent.EventType.OBJECTIVE_DETAIL, String.format(
-					// "A {snap} item entity has EXPIRED in {area} (@ {loc})"
 					"A %s item entity has EXPIRED in %s (@ %s)",
 					snap, getLocationDescription(loc, match), LocationUtil.toBlockCoords(loc)
 				), loc, unpack(snap)
