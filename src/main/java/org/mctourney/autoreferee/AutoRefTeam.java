@@ -636,9 +636,6 @@ public class AutoRefTeam implements Metadatable, Comparable<AutoRefTeam>
 		// if there is no match object, drop out here
 		if (match == null) return false;
 
-		// if the match is in progress, no one may join
-		if (!match.getCurrentState().isBeforeMatch() && !force) return false;
-
 		// prepare the player
 		if (!match.getCurrentState().inProgress() && !this.spawnRegions.isEmpty())
 			player.teleport(this.getSpawnLocation());
@@ -678,10 +675,6 @@ public class AutoRefTeam implements Metadatable, Comparable<AutoRefTeam>
 		PlayerTeamLeaveEvent event = new PlayerTeamLeaveEvent(player, this);
 		AutoReferee.callEvent(event);
 		if (event.isCancelled()) return false;
-
-		// if the match is in progress, no one may leave their team
-		if (!match.getCurrentState().isBeforeMatch() && !force &&
-			match.getReferees().size() > 0) return false;
 
 		String name = match.getDisplayName(player);
 		if (!this.leaveQuietly(player)) return false;

@@ -88,7 +88,7 @@ public class ZoneListener implements Listener
 		if (apl == null)
 		{
 			// if the player is not on a team and has left the start area and is not in creative, teleport back
-			if (!match.isSpectator(player) && !match.inStartRegion(event.getTo()) && onGround && player.getGameMode() != GameMode.CREATIVE)
+			if (!match.isSpectator(player) && !match.inStartRegion(event.getTo()) && onGround && (player.getGameMode() != GameMode.CREATIVE && player.getGameMode() != GameMode.SPECTATOR))
 			{
 				player.teleport(match.getWorldSpawn());
 				player.setFallDistance(0.0f);
