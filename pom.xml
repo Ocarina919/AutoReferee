@@ -116,7 +116,7 @@
 	  <groupId>commons-logging</groupId>
 	  <artifactId>commons-logging</artifactId>
 	  <version>1.2</version>
-   </dependency>
+    </dependency>
    
    <!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind -->
 	<dependency>
@@ -229,6 +229,7 @@
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-shade-plugin</artifactId>
         <version>1.7</version>
+
         <executions>
           <execution>
             <phase>package</phase>
@@ -258,14 +259,14 @@
                   <include>joda-time:joda-time</include>
                 </includes>
               </artifactSet>
-              <filters>
+              <!--<filters>
                 <filter>
                   <artifact>commons-logging:commons-logging</artifact>
                   <includes>
                     <include>org/apache/commons/logging/impl/*</include>
                   </includes>
                 </filter>
-              </filters>
+              </filters>-->
             </configuration>
           </execution>
         </executions>
