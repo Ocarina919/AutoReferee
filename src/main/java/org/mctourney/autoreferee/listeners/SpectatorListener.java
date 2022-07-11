@@ -169,15 +169,6 @@ public class SpectatorListener implements PluginMessageListener, Listener
 
 		if (AutoReferee.REFEREE_PLUGIN_CHANNEL.equals(event.getChannel()) && match != null)
 		{
-			// if this is a player, complain and force them to quit their team!
-			if (match.isPlayer(pl) && !pl.isOp())
-			{
-				AutoRefPlayer apl = match.getPlayer(pl);
-				for (Player ref : match.getReferees(true)) ref.sendMessage(apl.getDisplayName() +
-					ChatColor.DARK_GRAY + " attempted to log in with a modified client!");
-				match.leaveTeam(pl, true);
-			}
-
 			// update a referee with the latest information regarding the match
 			if (match.isReferee(pl)) match.updateReferee(pl);
 		}
