@@ -2423,7 +2423,7 @@ public class AutoRefMatch implements Metadatable
 				}
 				else
 				{
-					long minutesRemaining = secondsRemaining / 60L - 1;
+					long minutesRemaining = secondsRemaining / 60L + 1;
 
 					if (announceMinutes.contains(minutesRemaining))
 					{
