@@ -32,10 +32,6 @@
       <url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
     </repository>
     <repository>
-      <id>sk89q</id>
-      <url>http://maven.sk89q.com/repo/</url>
-    </repository>
-    <repository>
       <id>Plugin Metrics</id>
       <url>http://repo.mcstats.org/content/repositories/public</url>
     </repository>

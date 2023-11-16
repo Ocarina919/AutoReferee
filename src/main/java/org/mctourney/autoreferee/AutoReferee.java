@@ -33,13 +33,7 @@ import org.mctourney.autoreferee.commands.PlayerCommands;
 import org.mctourney.autoreferee.commands.PracticeCommands;
 import org.mctourney.autoreferee.commands.ScoreboardCommands;
 import org.mctourney.autoreferee.commands.SpectatorCommands;
-import org.mctourney.autoreferee.listeners.CombatListener;
-import org.mctourney.autoreferee.listeners.ObjectiveTracker;
-import org.mctourney.autoreferee.listeners.ObjectiveTracer;
-import org.mctourney.autoreferee.listeners.SpectatorListener;
-import org.mctourney.autoreferee.listeners.TeamListener;
-import org.mctourney.autoreferee.listeners.WorldListener;
-import org.mctourney.autoreferee.listeners.ZoneListener;
+import org.mctourney.autoreferee.listeners.*;
 import org.mctourney.autoreferee.listeners.lobby.LobbyListener;
 import org.mctourney.autoreferee.listeners.lobby.LobbyListener.LobbyMode;
 import org.mctourney.autoreferee.util.NullChunkGenerator;
@@ -294,6 +288,7 @@ public class AutoReferee extends JavaPlugin
 		pm.registerEvents(new WorldListener(this), this);
 		pm.registerEvents(new ObjectiveTracker(this), this);
 		pm.registerEvents(new ObjectiveTracer(this), this);
+		pm.registerEvents(new MapTourListener(this), this);
 
 		// save this reference to use for setting up the referee channel later
 		pm.registerEvents(refChannelListener = new SpectatorListener(this), this);

@@ -4,9 +4,7 @@ import java.util.List;
 import java.util.Set;
 
 import com.google.common.collect.Sets;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.OfflinePlayer;
+import org.bukkit.*;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.conversations.BooleanPrompt;
@@ -14,6 +12,7 @@ import org.bukkit.conversations.Conversation;
 import org.bukkit.conversations.ConversationContext;
 import org.bukkit.conversations.Prompt;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -21,7 +20,10 @@ import org.mctourney.autoreferee.AutoRefMatch;
 import org.mctourney.autoreferee.AutoRefTeam;
 import org.mctourney.autoreferee.AutoReferee;
 import org.mctourney.autoreferee.event.player.PlayerTeamJoinEvent;
+import org.mctourney.autoreferee.goals.AutoRefGoal;
+import org.mctourney.autoreferee.listeners.SpectatorListener;
 import org.mctourney.autoreferee.listeners.TeamListener;
+import org.mctourney.autoreferee.util.PlayerUtil;
 import org.mctourney.autoreferee.util.commands.AutoRefCommand;
 import org.mctourney.autoreferee.util.commands.AutoRefPermission;
 import org.mctourney.autoreferee.util.commands.CommandHandler;
@@ -375,4 +377,56 @@ public class PlayerCommands implements CommandHandler
 		}
 	}
 
+	@AutoRefCommand(name={"maptour"},
+			description="Look around a little bit!")//TODO give a better description...
+	@AutoRefPermission(console=false, nodes={"autoreferee.player"})
+
+	public boolean maptour(CommandSender sender, AutoRefMatch match, String[] args, CommandLine options)
+	{
+		// if there is no match in progress, or the match has started, quit
+		if (match == null || !match.getCurrentState().isBeforeMatch()) return false;
+
+		Player player = sender instanceof Player ? (Player) sender : null;
+
+		PlayerUtil.setGameMode(player, GameMode.CREATIVE);
+
+		//player.getInventory().setItem(0, new ItemStack(Material.ARROW));
+		player.getInventory().setItem(0, new ItemStack(Material.BLAZE_POWDER));
+
+		return true;
+	}
+
+	@AutoRefCommand(name={"unready"},
+			description="Mark your team as not ready.")
+	@AutoRefPermission(console=true, nodes={"autoreferee.player"}) //TODO this should just call /ready -n
+
+	public boolean unready(CommandSender sender, AutoRefMatch match, String[] args, CommandLine options)
+	{
+		// if there is no match in progress, or the match has started, quit
+		if (match == null || !match.getCurrentState().isBeforeMatch()) return false;
+
+		Player player = sender instanceof Player ? (Player) sender : null;
+
+		if (match.isCountdownRunning()) {
+			String name = sender instanceof ConsoleCommandSender
+					? "console" : match.getDisplayName(player);
+			match.broadcast(ChatColor.GREEN + "Countdown cancelled by " + name);
+			match.cancelCountdown();
+		}
+
+		// Reset the ready delay.
+		match.setReadyDelay(-1);
+
+		// if console or referee sends this message
+		if (sender instanceof ConsoleCommandSender || match.isReferee(player)) {
+			match.setRefereeReady(false);
+		}
+		else {
+			AutoRefTeam team = match.getPlayerTeam(player);
+			if (team != null) team.setReady(false);
+		}
+
+		match.checkTeamsStart();
+		return true;
+	}
 }

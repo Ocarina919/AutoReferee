@@ -195,7 +195,56 @@ public class AdminCommands implements CommandHandler
 		
 		return true;
 	}
-	
+
+	@AutoRefCommand(name={"autoref", "captains"},
+			description="Wow! That's not so windey!",
+			usage="<command>")
+	@AutoRefPermission(nodes={"autoreferee.admin"})
+
+	public boolean captainsDraft(CommandSender sender, AutoRefMatch match, String[] args, CommandLine options)
+	{
+		if(match == null) return false;
+
+		if(!match.getCurrentState().isBeforeMatch()) {
+			sender.sendMessage(ChatColor.RED + "Cannot change team during or after match!");
+			return true;
+		}
+
+		for( AutoRefPlayer arp : match.getPlayers() ) {
+			AutoRefTeam t = arp.getTeam();
+
+			if(t != null) {
+				t.leave(arp.getPlayer());
+			}
+		}
+
+		int teams = match.getTeams().size();
+
+		if(teams <= 0)
+			return true;
+
+		World world = match.getWorld();
+
+		if(world == null) return true;
+
+		//Collection<Player> players = world.getPlayers();
+
+		List<Player> newPlayers = new ArrayList<Player>(world.getPlayers());
+		Collections.shuffle(newPlayers, new SecureRandom());
+
+		List<AutoRefTeam> arTeams = new ArrayList<AutoRefTeam>(match.getTeams());
+		Collections.shuffle(arTeams, new SecureRandom());
+
+		int i = 0;
+		for(Player p : newPlayers ) {
+			AutoRefTeam team = arTeams.get(i % teams);
+			team.join(p, Reason.MANUAL);
+			i++;
+		}
+
+		return true;
+	}
+
 	@AutoRefCommand(name={"autoref", "reload"}, options="x",
 		description="Reloads the current map (or specified map) to its original, unmodified state. Players are migrated to the new copy.",
 		usage="<command> [<map name>]",

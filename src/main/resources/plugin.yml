@@ -26,7 +26,7 @@ commands:
     description: Join another player's match
     usage: /<command> <player>
   listmatches:
-    aliases: [matchlist, matches]
+    aliases: [matchlist, matches, ml]
     description: List all matches available on the server
     usage: /<command>
   leavematch:
@@ -47,6 +47,12 @@ commands:
   ready:
     description: Mark team as ready to play
     usage: /<command> -tfyn
+  unready:
+    description: Mark team as not ready to play
+    usage: /<command>
+  maptour:
+    description: Fly around a little
+    usage: /<command>
   viewinventory:
     aliases: vi
     description: View the inventory of the player

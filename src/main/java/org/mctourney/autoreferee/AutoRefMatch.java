@@ -142,6 +142,14 @@ public class AutoRefMatch implements Metadatable
 	// set this to false to not give match info books to players
 	public static boolean giveMatchInfoBooks = true;
 
+	public int checkcount = 0;
+	public class NewTickCheck extends BukkitRunnable {
+		private boolean hasChecked = false;
+		public void run() {
+			hasChecked = false;
+		}
+	}
+
 	static
 	{
 		File matchSummaryDirectory;
@@ -939,6 +947,8 @@ public class AutoRefMatch implements Metadatable
 
 	PlayerCountTask countTask = null;
 
+	NewTickCheck newTickCheck = null;
+
 	public AutoRefMatch(World world, boolean tmp, MatchStatus state)
 	{ this(world, tmp); setCurrentState(state); }
 
@@ -1005,6 +1015,10 @@ public class AutoRefMatch implements Metadatable
 
 		// startup the player count timer (for automatic unloading)
 		countTask.runTaskTimer(AutoReferee.getInstance(), 5L, 60*20L);
+
+		newTickCheck = new NewTickCheck();
+
+		newTickCheck.runTaskTimer(AutoReferee.getInstance(), 0L, 1L);
 	}
 
 	/**
@@ -2718,6 +2732,13 @@ public class AutoRefMatch implements Metadatable
 		if (!getCurrentState().inProgress())
 		{ return; }
 
+		if (this.newTickCheck.hasChecked == true)
+		{ return; }
+		else {
+			this.newTickCheck.hasChecked = true;
+		}
+		checkcount++;
+
 		Set<AutoRefTeam> winningTeams = Sets.newHashSet();
 		for (AutoRefTeam team : this.teams)
 		{
@@ -2811,6 +2832,8 @@ public class AutoRefMatch implements Metadatable
 		// announce the victory and set the match to completed
 		if (team != null) this.broadcast(team.getDisplayName() + " Wins!");
 		else this.broadcast("Match terminated!");
+
+		AutoReferee.log("checked win con " + checkcount + " times");
 
 		// don't have to delay this anymore :)
 		clearEntities();

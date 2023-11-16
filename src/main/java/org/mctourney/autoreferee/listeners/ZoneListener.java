@@ -17,6 +17,7 @@ import org.bukkit.event.Cancellable;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockFromToEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
@@ -37,6 +38,7 @@ import org.bukkit.event.player.PlayerPickupItemEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.event.vehicle.VehicleEnterEvent;
 import org.bukkit.event.weather.WeatherChangeEvent;
+import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.plugin.Plugin;
 import org.mctourney.autoreferee.AutoRefMatch;
 import org.mctourney.autoreferee.AutoRefPlayer;
@@ -310,8 +312,11 @@ public class ZoneListener implements Listener
 			if (match.isStartMechanism(block) && !match.getStartMechanism(block).canFlip(match))
 			{ event.setCancelled(true); return; }
 
-			if (!validPlayer(player))
-			{ event.setCancelled(true); return; }
+			if(block.getState() instanceof InventoryHolder && event.getAction().equals(Action.RIGHT_CLICK_BLOCK)){}
+			else if (!validPlayer(player)) {
+					event.setCancelled(true);
+					return;
+			}
 
 			if (RESTRICTED_BLOCKS.contains(block.getType()))
 			{ event.setCancelled(true); return; }

@@ -276,13 +276,13 @@ public class SpectatorListener implements PluginMessageListener, Listener
 		}
 	}
 
-	@EventHandler(priority=EventPriority.HIGHEST, ignoreCancelled=true)
+	@EventHandler(priority=EventPriority.HIGHEST, ignoreCancelled=true)//TODO modify to prevent MapTourists from changing items (currently prevents nonplayers, not sure how this works for people that have joined teams)
 	public void foreignInventoryEvent(InventoryClickEvent event)
 	{
 		Player player = (Player) event.getWhoClicked();
 		AutoRefMatch match = plugin.getMatch(player.getWorld());
 
-		if (match != null && !match.isPlayer(player))
+		if (match != null && (!match.isPlayer(player) || !match.getCurrentState().inProgress()))
 			switch (event.getInventory().getType())
 			{
 				case PLAYER:
@@ -300,7 +300,7 @@ public class SpectatorListener implements PluginMessageListener, Listener
 		AutoRefMatch match = plugin.getMatch(event.getEntity().getWorld());
 		if (!(entity instanceof Player) || match == null) return;
 
-		if (!match.isPlayer((Player) entity))
+		if (!match.isPlayer((Player) entity) || !match.getCurrentState().inProgress())
 		{ event.setCancelled(true); return; }
 	}
 
