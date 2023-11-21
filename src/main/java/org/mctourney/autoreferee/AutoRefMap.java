@@ -23,6 +23,7 @@ import org.bukkit.WorldCreator;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.configuration.file.FileConfiguration;
 
 import org.mctourney.autoreferee.event.match.MatchLoadEvent;
 import org.mctourney.autoreferee.util.NullChunkGenerator;
@@ -562,11 +563,22 @@ public class AutoRefMap implements Comparable<AutoRefMap>
 		Enumeration<? extends ZipEntry> entries = zfile.entries();
 
 		File f, basedir = null;
-		File tmp = FileUtils.getTempDirectory();
+
+		File tmpDirectory;
+		// determine the location of the tmp directory
+		FileConfiguration config = AutoReferee.getInstance().getConfig();
+		if (config.isString("local-storage.tmp.directory"))
+			tmpDirectory = new File(config.getString("local-storage.tmp.directory"));
+		else tmpDirectory = FileUtils.getTempDirectory();
+
+		// if the folder doesnt exist, create it...
+		if (!tmpDirectory.exists()) tmpDirectory.mkdir();
+
 		while (entries.hasMoreElements())
 		{
 			ZipEntry entry = entries.nextElement();
-			f = new File(tmp, entry.getName());
+
+			f = new File(tmpDirectory, entry.getName());
 			if (f.exists()) FileUtils.deleteQuietly(f);
 
 			if (entry.isDirectory()) FileUtils.forceMkdir(f);
