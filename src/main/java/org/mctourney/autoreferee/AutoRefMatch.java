@@ -28,6 +28,10 @@ import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.Permission;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.amazonaws.services.s3.model.SetPublicAccessBlockRequest;
+
+import com.amazonaws.auth.BasicAWSCredentials;
+import com.amazonaws.auth.AWSStaticCredentialsProvider;
+
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
@@ -3225,7 +3229,7 @@ public class AutoRefMatch implements Metadatable
 			report = event.getWebstats();
 
 			String webstats = null;
-			String domain = "http://godgamerstats.s3.amazonaws.com/summary"; //AutoReferee.getInstance().getConfig().getString("server-ip", null);
+			String domain = "http://rfw-pastes.s3.amazonaws.com"; //AutoReferee.getInstance().getConfig().getString("server-ip", null);
 
 			if (!event.isCancelled())
 			{
@@ -3278,20 +3282,16 @@ public class AutoRefMatch implements Metadatable
 
 		AutoReferee.log("Instantiating s3 client...");
 
-		final AmazonS3 s3 = AmazonS3ClientBuilder.standard()
-				.withRegion(Regions.US_EAST_1).build();
+		final AmazonS3 s3 = AmazonS3ClientBuilder
+				.standard()
+				.withRegion(Regions.US_WEST_2)
+				.withCredentials(new AWSStaticCredentialsProvider(PasteCredentials.creds))
+				.build();
 
 
 		try {
 
 			AutoReferee.log("Uploading...");
-
-			CanonicalGrantee grantee = new CanonicalGrantee("406f1cf2091f7a31d5616a430f6f4990bc8a965dd651a457eacd3acd4a544f08");
-			Grant grant = new Grant(grantee, Permission.FullControl);
-			Grant pub = new Grant(GroupGrantee.AllUsers, Permission.Read);
-
-			AccessControlList acl = new AccessControlList();
-			acl.grantAllPermissions(new Grant[]{grant, pub});
 
 			// https://github.com/aws/aws-sdk-java/blob/master/aws-java-sdk-s3/src/main/java/com/amazonaws/services/s3/AmazonS3Client.java
 			byte[] contentBytes = report.getBytes("utf8");
@@ -3304,9 +3304,7 @@ public class AutoRefMatch implements Metadatable
 			metadata.setContentType("text/html");
 			metadata.setContentLength(contentBytes.length);
 
-			//File f = new File("/home/char/Pictures/test.html");
-			PutObjectRequest req = new PutObjectRequest("godgamerstats", "summary/" + filename, is, metadata);
-			req.setAccessControlList(acl);
+			PutObjectRequest req = new PutObjectRequest("rfw-pastes", "" + filename, is, metadata);
 
 			s3.putObject(req);
 
