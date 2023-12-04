@@ -63,7 +63,7 @@ public class ReportGenerator
 	 * @param match match object
 	 * @return HTML for a match report web page, or null if an error occurred
 	 */
-	public String generate(AutoRefMatch match)
+	public String generate(AutoRefMatch match, Set<String> ref_names, Set<String> streamer_names)
 	{
 		String htm, css, js, images = "";
 		try
@@ -92,12 +92,12 @@ public class ReportGenerator
 				getTag(win), ChatColor.stripColor(win.getDisplayName()));
 
 		Set<String> refList = Sets.newHashSet();
-		for (Player pl : match.getReferees())
-			refList.add(String.format("<span class='referee'>%s</span>", pl.getName()));
+		for (String ref_name : ref_names)
+			refList.add(String.format("<span class='referee'>%s</span>", ref_name));
 
 		Set<String> streamerList = Sets.newHashSet();
-		for (Player pl : match.getStreamers())
-			streamerList.add(String.format("<span class='streamer'>%s</span>", pl.getName()));
+		for (String streamer_name : streamer_names)
+			streamerList.add(String.format("<span class='streamer'>%s</span>", streamer_name));
 
 		List<String> extraRows = Lists.newLinkedList();
 		for (Map.Entry<String, String> e : this.customDetails.entrySet())

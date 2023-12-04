@@ -3201,6 +3201,10 @@ public class AutoRefMatch implements Metadatable
 		private File localStorage = null;
 		private String webDirectory = null;
 
+		private Set<String> ref_names;
+
+		private Set<String> streamer_names;
+
 		public boolean serveLocally()
 		{ return webDirectory != null; }
 
@@ -3217,12 +3221,22 @@ public class AutoRefMatch implements Metadatable
 
 			this.webDirectory = AutoReferee.getInstance().getConfig()
 				.getString("local-storage.match-summary.web-directory", null);
+
+			//Player names are queried before the async run call because bukkit API calls in are not allowed in an async context (or rather, they randomly throw concurrent modification errors -_-)
+
+			this.ref_names = Sets.newHashSet();
+			for (Player pl : getReferees())
+				ref_names.add(pl.getName());
+
+			this.streamer_names = Sets.newHashSet();
+			for (Player pl : getStreamers())
+				streamer_names.add(pl.getName());
 		}
 
 		public void run()
 		{
 			broadcastSync(ChatColor.RED + "Generating Match Summary...");
-			String report = matchReportGenerator.generate(AutoRefMatch.this);
+			String report = matchReportGenerator.generate(AutoRefMatch.this, this.ref_names, this.streamer_names);
 
 			MatchUploadStatsEvent event = new MatchUploadStatsEvent(AutoRefMatch.this, report);
 			AutoReferee.callEvent(event);
